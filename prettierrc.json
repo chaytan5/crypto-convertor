@@ -1,0 +1,7 @@
+{
+	"trailingComma": "ES2020",
+	"tabWidth": 2,
+	"semi": false,
+	"singleQuote": true,
+	"tailwindConfig": "./styles/tailwind.config.js"
+}
