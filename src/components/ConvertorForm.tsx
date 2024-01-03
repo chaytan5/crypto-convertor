@@ -30,9 +30,8 @@ const formSchema = z.object({
 		required_error: "Please select a source cryptocurrency",
 	}),
 	amount: z.coerce
-		.number()
-		.multipleOf(0.01)
-		.min(0.01, { message: "Must be greater than 0.01" }),
+		.number({ required_error: "Please enter the amount" })
+		.min(0.001, { message: "Amount has to be larger than 0.01" }),
 	currency: z.string({
 		required_error: "Please select a currency",
 	}),
@@ -124,8 +123,11 @@ export function ConvertorForm() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Cryptocurrency</FormLabel>
-								<Select onValueChange={field.onChange} defaultValue={undefined}>
-									<FormControl>
+								<Select
+									onValueChange={field.onChange}
+									defaultValue={field.value}
+								>
+									<FormControl defaultValue={field.value}>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a currency" />
 										</SelectTrigger>
@@ -152,7 +154,7 @@ export function ConvertorForm() {
 							<FormItem>
 								<FormLabel>Amount</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="0.001" {...field} />
+									<Input type="text" placeholder="0.001" {...field} />
 								</FormControl>
 								<FormDescription>
 									Enter the amount you wish to convert
