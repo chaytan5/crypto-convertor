@@ -23,6 +23,7 @@ import {
 } from "./ui/select";
 
 import { useEffect, useState } from "react";
+import { getCryptoList, getFiatList } from "@/services/cryptoService";
 
 const formSchema = z.object({
 	cryptocurrency: z.string({
@@ -72,27 +73,22 @@ export function ConvertorForm() {
 	const [result, setResult] = useState<Result | null>(null);
 
 	useEffect(() => {
-		async function getFiatList() {
-			const res = await axios.get("http://localhost:7000/api/fiat/list");
-			const data = res.data;
-			setFiatList(data.data.data);
-		}
+		(async () => {
+			const data = await getFiatList();
+			if (data !== undefined) {
+				setFiatList(data);
+			}
+		})();
 
-		async function getCryptoList() {
-			const res = await axios.get("http://localhost:7000/api/crypto/list");
-			const data = res.data;
-			setCryptoList(data.data);
-		}
-
-		getFiatList();
-		getCryptoList();
+		(async () => {
+			const data = await getCryptoList();
+			setCryptoList(data);
+		})();
 	}, []);
 
 	useEffect(() => {
-		form.reset({
-			amount: 0,
-		});
-	}, [form.formState.isSubmitSuccessful]);
+		form.reset({ amount: 0 });
+	}, [form.formState.isSubmitSuccessful, form.reset]);
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
@@ -128,7 +124,7 @@ export function ConvertorForm() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Cryptocurrency</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue={undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a currency" />
@@ -156,7 +152,7 @@ export function ConvertorForm() {
 							<FormItem>
 								<FormLabel>Amount</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="10.00" {...field} />
+									<Input type="number" placeholder="0.001" {...field} />
 								</FormControl>
 								<FormDescription>
 									Enter the amount you wish to convert
@@ -171,7 +167,7 @@ export function ConvertorForm() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Currency</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue="USD">
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select a currency" />
