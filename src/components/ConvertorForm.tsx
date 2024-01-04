@@ -94,10 +94,12 @@ export function ConvertorForm() {
 			setFormState("loading");
 			const { amount, cryptocurrency, currency } = values;
 
-			const res = await axios.post("http://localhost:7000/api/convert", {
-				crypto: cryptocurrency,
-				fiat: currency,
-				amount: amount,
+			const res = await axios.get("http://localhost:7000/api/convert", {
+				params: {
+					crypto: cryptocurrency,
+					fiat: currency,
+					amount: amount,
+				},
 			});
 
 			const { data } = res;
