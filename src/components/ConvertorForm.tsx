@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +22,11 @@ import {
 } from "./ui/select";
 
 import { useEffect, useState } from "react";
-import { getCryptoList, getFiatList } from "@/services/cryptoService";
+import {
+	convertCrypto,
+	getCryptoList,
+	getFiatList,
+} from "@/services/cryptoService";
 
 const formSchema = z.object({
 	cryptocurrency: z.string({
@@ -90,29 +93,16 @@ export function ConvertorForm() {
 	}, [form.formState.isSubmitSuccessful, form.reset]);
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		try {
-			setFormState("loading");
-			const { amount, cryptocurrency, currency } = values;
+		setFormState("loading");
+		const { amount, cryptocurrency, currency } = values;
 
-			const res = await axios.get("http://localhost:7000/api/convert", {
-				params: {
-					crypto: cryptocurrency,
-					fiat: currency,
-					amount: amount,
-				},
-			});
+		const data = await convertCrypto(cryptocurrency, amount, currency);
 
-			const { data } = res;
-
-			const { convertedAmount, fiat } = data;
-
-			setResult({ convertedAmount, fiat });
-		} catch (error) {
-			setFormState("error");
-			console.log(error);
-		} finally {
-			setFormState("idle");
+		if (data) {
+			setResult(data);
 		}
+
+		setFormState("idle");
 	}
 
 	return (

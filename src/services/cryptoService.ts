@@ -2,8 +2,6 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-console.log(API_URL);
-
 export async function getFiatList() {
 	try {
 		const res = await axios.get(`${API_URL}/api/fiat/list`);
@@ -31,5 +29,33 @@ export async function getCryptoList() {
 			console.log(error);
 		}
 		return undefined;
+	}
+}
+
+export async function convertCrypto(
+	cryptocurrency: string,
+	amount: number,
+	currency: string
+) {
+	try {
+		const res = await axios.get(`${API_URL}/api/convert`, {
+			params: {
+				crypto: cryptocurrency,
+				fiat: currency,
+				amount: amount,
+			},
+		});
+
+		const { data } = res;
+
+		if (!data.error) {
+			const { convertedAmount, fiat } = data;
+
+			return { convertedAmount, fiat };
+		} else {
+			return null;
+		}
+	} catch (error) {
+		console.log(error);
 	}
 }
